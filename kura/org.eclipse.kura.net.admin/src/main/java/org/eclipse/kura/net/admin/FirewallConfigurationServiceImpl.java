@@ -105,23 +105,15 @@ public class FirewallConfigurationServiceImpl
     protected void activate(ComponentContext componentContext, Map<String, Object> properties) {
         logger.debug("activate()");
 
-        // we are intentionally ignoring the properties from ConfigAdmin at startup
-        if (properties == null) {
-            logger.debug("activate() :: Got null properties...");
-        } else {
-            for (Entry<String, Object> entry : properties.entrySet()) {
-                logger.debug("activate() :: Props... {}={}", entry.getKey(), entry.getValue());
-            }
-        }
-
         this.firewall = getLinuxFirewall();
-        setFloodingProtectionConfiguration();
 
         Dictionary<String, Object> props = new Hashtable<>();
         String[] eventTopics = { FloodingProtectionConfigurationChangeEvent.FP_EVENT_CONFIG_CHANGE_TOPIC };
         props.put(EventConstants.EVENT_TOPIC, eventTopics);
         this.serviceRegistration = componentContext.getBundleContext().registerService(EventHandler.class.getName(),
                 this, props);
+
+        updated(properties);
     }
 
     protected void deactivate(ComponentContext componentContext) {
